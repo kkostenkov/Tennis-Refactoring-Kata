@@ -1,81 +1,74 @@
+using System;
+using System.Collections.Generic;
+
 namespace Tennis
 {
     public class TennisGame1 : ITennisGame
     {
-        private int m_score1 = 0;
-        private int m_score2 = 0;
-        private string player1Name;
-        private string player2Name;
+        private readonly Dictionary<int, string> scoreNames = new Dictionary<int, string> {
+            { 0, "Love" },
+            { 1, "Fifteen" },
+            { 2, "Thirty" },
+            { 3, "Forty" },
+        };
+        private readonly string deuceName = "Deuce";
+        private int mScore1 = 0;
+        private int mScore2 = 0;
 
         public TennisGame1(string player1Name, string player2Name)
         {
-            this.player1Name = player1Name;
-            this.player2Name = player2Name;
         }
 
         public void WonPoint(string playerName)
         {
-            if (playerName == "player1")
-                m_score1 += 1;
-            else
-                m_score2 += 1;
+            if (playerName == "player1") {
+                mScore1++;
+            }
+            else {
+                mScore2++;
+            }
         }
 
         public string GetScore()
         {
-            string score = "";
-            var tempScore = 0;
-            if (m_score1 == m_score2)
-            {
-                switch (m_score1)
-                {
-                    case 0:
-                        score = "Love-All";
-                        break;
-                    case 1:
-                        score = "Fifteen-All";
-                        break;
-                    case 2:
-                        score = "Thirty-All";
-                        break;
-                    default:
-                        score = "Deuce";
-                        break;
+            var isEqualScore = mScore1 == mScore2;
+            if (isEqualScore) {
+                return AnnounceEqualPoints(mScore1);
+            }
 
-                }
+            var isBeforeLateGame = mScore1 < 4 && mScore2 < 4;
+            if (isBeforeLateGame) {
+                return $"{GetScoreName(mScore1)}-{GetScoreName(mScore2)}";
             }
-            else if (m_score1 >= 4 || m_score2 >= 4)
-            {
-                var minusResult = m_score1 - m_score2;
-                if (minusResult == 1) score = "Advantage player1";
-                else if (minusResult == -1) score = "Advantage player2";
-                else if (minusResult >= 2) score = "Win for player1";
-                else score = "Win for player2";
+            
+            var isGameEnded = Math.Abs(mScore1 - mScore2) >= 2;
+            if (isGameEnded) {
+                return DeclareWinner(mScore1, mScore2);
             }
-            else
-            {
-                for (var i = 1; i < 3; i++)
-                {
-                    if (i == 1) tempScore = m_score1;
-                    else { score += "-"; tempScore = m_score2; }
-                    switch (tempScore)
-                    {
-                        case 0:
-                            score += "Love";
-                            break;
-                        case 1:
-                            score += "Fifteen";
-                            break;
-                        case 2:
-                            score += "Thirty";
-                            break;
-                        case 3:
-                            score += "Forty";
-                            break;
-                    }
-                }
+            return AnnounceAdvantage(mScore1, mScore2);
+        }
+
+        private string DeclareWinner(int points1, int points2)
+        {
+            return points1 > points2 ? "Win for player1" : "Win for player2";
+        }
+
+        private string GetScoreName(int points)
+        {
+            return scoreNames[points];
+        }
+
+        private string AnnounceAdvantage(int points1, int points2)
+        {
+            return points1 > points2 ? "Advantage player1" : "Advantage player2";
+        }
+        
+        private string AnnounceEqualPoints(int points)
+        {
+            if (points < 3) {
+                return $"{scoreNames[points]}-All";
             }
-            return score;
+            return deuceName;
         }
     }
 }
