@@ -1,143 +1,84 @@
+using System;
+using System.Collections.Generic;
+
 namespace Tennis
 {
     public class TennisGame2 : ITennisGame
     {
-        private int p1point;
-        private int p2point;
-
-        private string p1res = "";
-        private string p2res = "";
-        private string player1Name;
-        private string player2Name;
+        private int points1;
+        private int points2;
+        
+        private string name1;
+        private string name2;
 
         public TennisGame2(string player1Name, string player2Name)
         {
-            this.player1Name = player1Name;
-            p1point = 0;
-            this.player2Name = player2Name;
+            name1 = player1Name;
+            name2 = player2Name;
         }
 
         public string GetScore()
         {
-            var score = "";
-            if (p1point == p2point && p1point < 3)
-            {
-                if (p1point == 0)
-                    score = "Love";
-                if (p1point == 1)
-                    score = "Fifteen";
-                if (p1point == 2)
-                    score = "Thirty";
-                score += "-All";
+            var pointsDiff = Math.Abs(points1 - points2) >= 2;
+            var isGameOver = (points1 >= 4 || points2 >= 4) && pointsDiff;
+            if (isGameOver) {
+                return ScoreGameOver();
             }
-            if (p1point == p2point && p1point > 2)
-                score = "Deuce";
-
-            if (p1point > 0 && p2point == 0)
-            {
-                if (p1point == 1)
-                    p1res = "Fifteen";
-                if (p1point == 2)
-                    p1res = "Thirty";
-                if (p1point == 3)
-                    p1res = "Forty";
-
-                p2res = "Love";
-                score = p1res + "-" + p2res;
-            }
-            if (p2point > 0 && p1point == 0)
-            {
-                if (p2point == 1)
-                    p2res = "Fifteen";
-                if (p2point == 2)
-                    p2res = "Thirty";
-                if (p2point == 3)
-                    p2res = "Forty";
-
-                p1res = "Love";
-                score = p1res + "-" + p2res;
+            
+            if (points1 == points2) {
+                return ScoreEqual(points1);
             }
 
-            if (p1point > p2point && p1point < 4)
-            {
-                if (p1point == 2)
-                    p1res = "Thirty";
-                if (p1point == 3)
-                    p1res = "Forty";
-                if (p2point == 1)
-                    p2res = "Fifteen";
-                if (p2point == 2)
-                    p2res = "Thirty";
-                score = p1res + "-" + p2res;
+            if (points1 >= 3 && points2 >= 3) {
+                return ScoreAdvantage();
             }
-            if (p2point > p1point && p2point < 4)
-            {
-                if (p2point == 2)
-                    p2res = "Thirty";
-                if (p2point == 3)
-                    p2res = "Forty";
-                if (p1point == 1)
-                    p1res = "Fifteen";
-                if (p1point == 2)
-                    p1res = "Thirty";
-                score = p1res + "-" + p2res;
-            }
-
-            if (p1point > p2point && p2point >= 3)
-            {
-                score = "Advantage player1";
-            }
-
-            if (p2point > p1point && p1point >= 3)
-            {
-                score = "Advantage player2";
-            }
-
-            if (p1point >= 4 && p2point >= 0 && (p1point - p2point) >= 2)
-            {
-                score = "Win for player1";
-            }
-            if (p2point >= 4 && p1point >= 0 && (p2point - p1point) >= 2)
-            {
-                score = "Win for player2";
-            }
-            return score;
+            return ScoreMidgame();
         }
 
-        public void SetP1Score(int number)
+        private string ScoreGameOver()
         {
-            for (int i = 0; i < number; i++)
-            {
-                P1Score();
+            return points1 > points2 ? "Win for player1" : "Win for player2";
+        }
+
+        private string ScoreMidgame()
+        {
+            return $"{GetPointName(points1)}-{GetPointName(points2)}";
+        }
+
+        private string ScoreAdvantage()
+        {
+            return points1 > points2 ? "Advantage player1" : "Advantage player2";
+        }
+
+        private string ScoreEqual(int points)
+        {
+            if (points < 3) {
+                return $"{GetPointName(points)}-All";
             }
+            return "Deuce";
         }
 
-        public void SetP2Score(int number)
+        private readonly Dictionary<int, string> scoreNames = new Dictionary<int, string>() {
+            { 0, "Love" },
+            { 1, "Fifteen" },
+            { 2, "Thirty" },
+            { 3, "Forty" },
+        };
+            
+        private string GetPointName(int points)
         {
-            for (var i = 0; i < number; i++)
-            {
-                P2Score();
-            }
-        }
-
-        private void P1Score()
-        {
-            p1point++;
-        }
-
-        private void P2Score()
-        {
-            p2point++;
+            return scoreNames[points];
         }
 
         public void WonPoint(string player)
         {
-            if (player == "player1")
-                P1Score();
-            else
-                P2Score();
+            if (player == "player1") {
+                points1++;
+            }
+            else {
+                points2++;
+            }
         }
-
     }
 }
 
