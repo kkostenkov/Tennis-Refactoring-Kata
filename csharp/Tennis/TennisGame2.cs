@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace Tennis
@@ -6,13 +7,11 @@ namespace Tennis
     {
         private int p1point => players[player1Name].Points;
         private int p2point => players[player2Name].Points;
-
-        private string p1res = "";
-        private string p2res = "";
+        
         private string player1Name;
         private string player2Name;
 
-        private Dictionary<string, Player> players = new Dictionary<string, Player>();
+        private Dictionary<string, Player> players = new();
 
         public TennisGame2(string player1Name, string player2Name)
         {
@@ -24,6 +23,8 @@ namespace Tennis
 
         public string GetScore()
         {
+            var p1res = "";
+            var p2res = "";
             var score = "";
             if (p1point == p2point && p1point < 3)
             {
@@ -77,14 +78,8 @@ namespace Tennis
             }
             if (p2point > p1point && p2point < 4)
             {
-                if (p2point == 2)
-                    p2res = "Thirty";
-                if (p2point == 3)
-                    p2res = "Forty";
-                if (p1point == 1)
-                    p1res = "Fifteen";
-                if (p1point == 2)
-                    p1res = "Thirty";
+                p1res = GetPointsName(p1point);
+                p2res = GetPointsName(p2point);
                 score = p1res + "-" + p2res;
             }
 
@@ -107,6 +102,20 @@ namespace Tennis
                 score = "Win for player2";
             }
             return score;
+        }
+
+        private string GetPointsName(int points)
+        {
+            if (points == 0)
+                return "Love";
+            if (points == 1)
+                return "Fifteen";
+            if (points == 2)
+                return "Thirty";
+            if (points == 3)
+                return "Forty";
+            
+            return String.Empty;
         }
 
         public void WonPoint(string player)
