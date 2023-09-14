@@ -1,20 +1,25 @@
+using System.Collections.Generic;
+
 namespace Tennis
 {
     public class TennisGame2 : ITennisGame
     {
-        private int p1point;
-        private int p2point;
+        private int p1point => players[player1Name].Points;
+        private int p2point => players[player2Name].Points;
 
         private string p1res = "";
         private string p2res = "";
         private string player1Name;
         private string player2Name;
 
+        private Dictionary<string, Player> players = new Dictionary<string, Player>();
+
         public TennisGame2(string player1Name, string player2Name)
         {
             this.player1Name = player1Name;
-            p1point = 0;
             this.player2Name = player2Name;
+            players[player1Name] = new Player(player1Name);
+            players[player2Name] = new Player(player2Name);
         }
 
         public string GetScore()
@@ -104,40 +109,29 @@ namespace Tennis
             return score;
         }
 
-        public void SetP1Score(int number)
-        {
-            for (int i = 0; i < number; i++)
-            {
-                P1Score();
-            }
-        }
-
-        public void SetP2Score(int number)
-        {
-            for (var i = 0; i < number; i++)
-            {
-                P2Score();
-            }
-        }
-
-        private void P1Score()
-        {
-            p1point++;
-        }
-
-        private void P2Score()
-        {
-            p2point++;
-        }
-
         public void WonPoint(string player)
         {
-            if (player == "player1")
-                P1Score();
-            else
-                P2Score();
+            players[player].Score();
         }
 
     }
+
+    public class Player
+    {
+        public string Name { get; }
+        public int Points { get; private set; }
+
+        public Player(string name)
+        {
+            Name = name;
+            Points = 0;
+        }
+
+        public void Score()
+        {
+            Points++;
+        }
+    }
+    
 }
 
